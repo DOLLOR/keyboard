@@ -26,13 +26,14 @@ input2.onclick = function(){
 */
 ;(function(exports){
 	"use strict";
-	var DIV_ID = 'numberKeyBoard_' + (""+Math.random()).slice(2);
+	var DIV_ID;
 	var KeyBoard = function(input, options){
 		options = options || {};
 		var body = (document.body)||(document.getElementsByTagName('body')[0]);
+		DIV_ID = DIV_ID || `numberKeyBoard_${Math.random().toString().slice(2)}`;
 		
 		if(document.getElementById(DIV_ID)){
-			body.removeChild(document.getElementById(DIV_ID));
+			return;
 		}
 		
 		this.input = input;
