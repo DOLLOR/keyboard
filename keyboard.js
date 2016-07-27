@@ -62,9 +62,12 @@ input2.onclick = function(){
 		this.el.style.backgroundColor = "#FFF";
 		
 		//样式
+		var arrayToHtml = function(arr,cb){
+			return arr.map(cb).join("");
+		};
 		var inputPreviewId = "numberKeyBoardPreview";
-		var cssStr = `
-			<style type="text/css">
+		this.el.innerHTML =
+			`<style type="text/css">
 				#${DIV_ID}{
 					position:fixed;
 					left:0;
@@ -98,20 +101,16 @@ input2.onclick = function(){
 			<div class="${inputPreviewId}" style="float:left;height: 28px;line-height: 28px;margin:5px;">${input.value}</div>
 			<div style="width:60px;height:28px;background-color:#1FB9FF;float:right;margin:5px;text-align:center;color:#fff;line-height:28px;border-radius:3px;cursor:pointer;">完成</div>
 			<div style="width:60px;height:28px;background-color:#FFFFFF;float:right;margin:5px;text-align:center;color:#000;line-height:28px;border-radius:3px;cursor:pointer;">清空</div>
-		`;
-		
-		//table
-		var tableStr = `
+			
 			<table border="0" cellspacing="0" cellpadding="0">
-			${keyLists.map(row=>
+			${arrayToHtml(keyLists,row=>
 				`<tr>
-					${row.map(key=>`<td style="${keyStyles[key]}">${key}</td>`).join('')}
+					${arrayToHtml(row,key=>`<td style="${keyStyles[key]}">${key}</td>`)}
 				</tr>`
-			).join('')}
+			)}
 			</table>
 		`;
-		this.el.innerHTML = cssStr + tableStr;
-		
+
 		function addEvent(e){
 			var ev = e || window.event;
 			var clickEl = ev.element || ev.target;
