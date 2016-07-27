@@ -25,6 +25,7 @@ input2.onclick = function(){
 };
 */
 ;(function(exports){
+	"use strict";
 	var DIV_ID = 'numberKeyBoard_' + (""+Math.random()).slice(2);
 	var KeyBoard = function(input, options){
 		options = options || {};
