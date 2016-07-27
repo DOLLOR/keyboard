@@ -7,8 +7,9 @@
 	
 	
 ###二、用法
+	（0）对应旧浏览器，请用babel或者traceur转化为ES5语法;
 	（1）new KeyBoard(inputElement);
-	（2）禁用软键盘，添加readonly="readonly"属性；
+	（2）禁用软键盘，添加readonly="readonly"属性;
 	（3）Demo如下
 		<!DOCTYPE html>
 		<html>
@@ -32,19 +33,25 @@
 			(function(){
 				var input1 = document.getElementById('text1');
 				var input2 = document.getElementById('text2');
-			
+				
 				input1.onclick = function(){
 					new KeyBoard(input1);
 				};
-			
+				
 				input2.onclick = function(){
-					new KeyBoard(input2);
+					new KeyBoard(input2,{
+						keyLists:[[1,2,3],[4,5,6],[7,8,9],[".",0,"删除"]],
+						keyStyles:{
+							".":"background-color:#D3D9DF;",
+							"删除":"background-color:#D3D9DF;"
+						},
+						onFinish(after,before,inputElement){
+							//todo
+						}
+					});
 				};
 			
 			})();
 			</script>
 		</body>
 		</html>
-		
-###三、二维码
-![222](erweima.png)
