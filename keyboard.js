@@ -1,8 +1,34 @@
+/*
+https://github.com/DOLLOR/keyboard
+forked from https://github.com/vczero/keyboard
 
+Usage:
+
+var input1 = document.getElementById('text1');
+var input2 = document.getElementById('text2');
+
+input1.onclick = function(){
+	new KeyBoard(input1);
+};
+
+input2.onclick = function(){
+	new KeyBoard(input2,{
+		keyLists:[[1,2,3],[4,5,6],[7,8,9],[".",0,"删除"]],
+		keyStyles:{
+			".":"background-color:#D3D9DF;",
+			"删除":"background-color:#D3D9DF;"
+		},
+		onFinish(after,before,inputElement){
+			//todo
+		}
+	});
+};
+*/
 ;(function(exports){
 	var KeyBoard = function(input, options){
-		var body = document.getElementsByTagName('body')[0];
-		var DIV_ID = options && options.divId || '__w_l_h_v_c_z_e_r_o_divid';
+		options = options || {};
+		var body = (document.body)||(document.getElementsByTagName('body')[0]);
+		var DIV_ID = 'numberKeyBoard_' + (""+Math.random()).slice(2);
 		
 		if(document.getElementById(DIV_ID)){
 			body.removeChild(document.getElementById(DIV_ID));
@@ -12,65 +38,108 @@
 		this.el = document.createElement('div');
 		
 		var self = this;
-		var zIndex = options && options.zIndex || 1000;
-		var width = options && options.width || '100%';
-		var height = options && options.height || '193px';
-		var fontSize = options && options.fontSize || '15px';
-		var backgroundColor = options && options.backgroundColor || '#fff';
-		var TABLE_ID = options && options.table_id || 'table_0909099';
-		var mobile = typeof orientation !== 'undefined';
+		var mobile = false;//always use onclick typeof orientation !== 'undefined';
+		var keyLists = options.keyLists || [[1,2,3],[4,5,6],[7,8,9],[".",0,"删除"]];
+		var keyStyles = options.keyStyles || {
+			".":"background-color:#D3D9DF;",
+			"删除":"background-color:#D3D9DF;"
+		};
+		var onFinish;
+		if(typeof options.onFinish === "function"){
+			onFinish = (function(el){
+				var before = el.value;
+				return function(){
+					options.onFinish(input.value,before,input);
+					onFinish = null;
+					before = null;
+				};
+			})(input);
+		}
 		
 		this.el.id = DIV_ID;
-		this.el.style.position = 'absolute';
-		this.el.style.left = 0;
-		this.el.style.right = 0;
-		this.el.style.bottom = 0;
-		this.el.style.zIndex = zIndex;
-		this.el.style.width = width;
-		this.el.style.height = height;
-		this.el.style.backgroundColor = backgroundColor;
+		this.el.style.zIndex = 1000;
+		this.el.style.width = "100%";
+		this.el.style.backgroundColor = "#FFF";
 		
 		//样式
-		var cssStr = '<style type="text/css">';
-		cssStr += '#' + TABLE_ID + '{text-align:center;width:100%;height:160px;border-top:1px solid #CECDCE;background-color:#FFF;}';
-		cssStr += '#' + TABLE_ID + ' td{width:33%;border:1px solid #ddd;border-right:0;border-top:0;}';
-		if(!mobile){
-			cssStr += '#' + TABLE_ID + ' td:hover{background-color:#1FB9FF;color:#FFF;}';
-		}
-		cssStr += '</style>';
-		
-		//Button
-		var btnStr = '<div style="width:60px;height:28px;background-color:#1FB9FF;';
-		btnStr += 'float:right;margin-right:5px;text-align:center;color:#fff;';
-		btnStr += 'line-height:28px;border-radius:3px;margin-bottom:5px;cursor:pointer;">完成</div>';
+		var inputPreviewId = "numberKeyBoardPreview";
+		var cssStr = `
+			<style type="text/css">
+				#${DIV_ID}{
+					position:fixed;
+					left:0;
+					right:0;
+					bottom:0;
+					border-top:1px solid #ddd;
+				}
+				#${DIV_ID} *{
+					-webkit-box-sizing: border-box;
+					-moz-box-sizing: border-box;
+					box-sizing: border-box;
+				}
+				#${DIV_ID} table{
+					text-align:center;
+					width:100%;
+					border-top:1px solid #CECDCE;
+					background-color:#FFF;
+				}
+				#${DIV_ID} table td{
+					width:${100 / keyLists[0].length}%;
+					height:40px;
+					border:1px solid #ddd;
+					border-right:0;
+					border-top:0;
+				}
+				#${DIV_ID} table td:hover{
+					background-color:#1FB9FF;
+					color:#FFF;
+				}
+			</style>
+			<div class="${inputPreviewId}" style="float:left;height: 28px;line-height: 28px;margin:5px;">${input.value}</div>
+			<div style="width:60px;height:28px;background-color:#1FB9FF;float:right;margin:5px;text-align:center;color:#fff;line-height:28px;border-radius:3px;cursor:pointer;">完成</div>
+			<div style="width:60px;height:28px;background-color:#FFFFFF;float:right;margin:5px;text-align:center;color:#000;line-height:28px;border-radius:3px;cursor:pointer;">清空</div>
+		`;
 		
 		//table
-		var tableStr = '<table id="' + TABLE_ID + '" border="0" cellspacing="0" cellpadding="0">';
-			tableStr += '<tr><td>1</td><td>2</td><td>3</td></tr>';
-			tableStr += '<tr><td>4</td><td>5</td><td>6</td></tr>';
-			tableStr += '<tr><td>7</td><td>8</td><td>9</td></tr>';
-			tableStr += '<tr><td style="background-color:#D3D9DF;">.</td><td>0</td>';
-			tableStr += '<td style="background-color:#D3D9DF;">删除</td></tr>';
-			tableStr += '</table>';
-		this.el.innerHTML = cssStr + btnStr + tableStr;
+		var tableStr = `
+			<table border="0" cellspacing="0" cellpadding="0">
+			${keyLists.map(row=>
+				`<tr>
+					${row.map(key=>`<td style="${keyStyles[key]}">${key}</td>`).join('')}
+				</tr>`
+			).join('')}
+			</table>
+		`;
+		this.el.innerHTML = cssStr + tableStr;
 		
 		function addEvent(e){
 			var ev = e || window.event;
 			var clickEl = ev.element || ev.target;
 			var value = clickEl.textContent || clickEl.innerText;
-			if(clickEl.tagName.toLocaleLowerCase() === 'td' && value !== "删除"){
+
+			if(clickEl.tagName.toLocaleLowerCase() === 'td' && value === "删除"){
+				var num = self.input.value;
+				if(num){
+					self.input.value = num.slice(0,-1);
+				}
+			}else if(clickEl.tagName.toLocaleLowerCase() === 'div' && value === "完成"){
+				//click on  finish
+				body.removeChild(self.el);
+				if(onFinish) onFinish();
+				self.el = null;
+			}else if(clickEl.tagName.toLocaleLowerCase() === 'div' && value === "清空"){
+				//click on  empey
+				if(self.input){
+					self.input.value = "";
+				}
+			}else if(clickEl.tagName.toLocaleLowerCase() === 'td'){
+				//click on a number
 				if(self.input){
 					self.input.value += value;
 				}
-			}else if(clickEl.tagName.toLocaleLowerCase() === 'div' && value === "完成"){
-				body.removeChild(self.el);
-			}else if(clickEl.tagName.toLocaleLowerCase() === 'td' && value === "删除"){
-				var num = self.input.value;
-				if(num){
-					var newNum = num.substr(0, num.length - 1);
-					self.input.value = newNum;
-				}
 			}
+			//set display
+			self&&self.el&&( self.el.getElementsByClassName(inputPreviewId)[0].innerText = self.input.value );
 		}
 		
 		if(mobile){
@@ -79,8 +148,22 @@
 			this.el.onclick = addEvent;
 		}
 		body.appendChild(this.el);
-	}
+	};
 	
-	exports.KeyBoard = KeyBoard;
+	exports.NumberKeyBoard = KeyBoard;
 
-})(window);
+})((function(g){
+	if(typeof module !== "undefined" && module.exports){
+		return module.exports;
+	}
+	else if(typeof define !== "undefined" && define.amd){
+		var out = {};
+		define(function(require, exports, module){
+			module.exports = out;
+		});
+		return out;
+	}
+	else{
+		return g;
+	}
+})(this));
