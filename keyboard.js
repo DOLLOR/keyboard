@@ -25,10 +25,10 @@ input2.onclick = function(){
 };
 */
 ;(function(exports){
+	var DIV_ID = 'numberKeyBoard_' + (""+Math.random()).slice(2);
 	var KeyBoard = function(input, options){
 		options = options || {};
 		var body = (document.body)||(document.getElementsByTagName('body')[0]);
-		var DIV_ID = 'numberKeyBoard_' + (""+Math.random()).slice(2);
 		
 		if(document.getElementById(DIV_ID)){
 			body.removeChild(document.getElementById(DIV_ID));
