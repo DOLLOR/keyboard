@@ -59,9 +59,6 @@ input2.onclick = function(){
 		}
 		
 		this.el.id = DIV_ID;
-		this.el.style.zIndex = 1000;
-		this.el.style.width = "100%";
-		this.el.style.backgroundColor = "#FFF";
 		
 		//样式
 		var arrayToHtml = function(arr,cb){
@@ -76,6 +73,9 @@ input2.onclick = function(){
 					right:0;
 					bottom:0;
 					border-top:1px solid #ddd;
+					z-index: 1000;
+					width: 100%;
+					background-color:#FFF;
 				}
 				#${DIV_ID} *{
 					-webkit-box-sizing: border-box;
@@ -86,7 +86,6 @@ input2.onclick = function(){
 					text-align:center;
 					width:100%;
 					border-top:1px solid #CECDCE;
-					background-color:#FFF;
 				}
 				#${DIV_ID} table td{
 					width:${100 / keyLists[0].length}%;
@@ -102,12 +101,20 @@ input2.onclick = function(){
 			</style>
 			<div class="${inputPreviewId}" style="float:left;height: 28px;line-height: 28px;margin:5px;">${input.value}</div>
 			<div style="width:60px;height:28px;background-color:#1FB9FF;float:right;margin:5px;text-align:center;color:#fff;line-height:28px;border-radius:3px;cursor:pointer;">完成</div>
-			<div style="width:60px;height:28px;background-color:#FFFFFF;float:right;margin:5px;text-align:center;color:#000;line-height:28px;border-radius:3px;cursor:pointer;">清空</div>
+			<div style="
+				width:60px;
+				height:28px;
+				float:right;
+				margin:5px;
+				text-align:center;
+				line-height:28px;
+				border-radius:3px;
+				cursor:pointer;">清空</div>
 			
 			<table border="0" cellspacing="0" cellpadding="0">
 			${arrayToHtml(keyLists,row=>
 				`<tr>
-					${arrayToHtml(row,key=>`<td style="${keyStyles[key]}">${key}</td>`)}
+					${arrayToHtml(row,key=>`<td style="${keyStyles[key] || ""}">${key}</td>`)}
 				</tr>`
 			)}
 			</table>
