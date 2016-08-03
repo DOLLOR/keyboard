@@ -20,6 +20,10 @@ input2.onclick = function(){
 		},
 		onFinish(after,before,inputElement){
 			//todo
+		},
+		onInput(after,before,inputElement){
+			//todo
+			return [inputValue,previewValue];
 		}
 	});
 };
@@ -56,6 +60,11 @@ input2.onclick = function(){
 					before = null;
 				};
 			})(input);
+		}
+
+		var onInput;
+		if(typeof options.onInput === "function"){
+			onInput = options.onInput;
 		}
 		
 		this.el.id = DIV_ID;
@@ -125,11 +134,12 @@ input2.onclick = function(){
 			var clickEl = ev.element || ev.target;
 			var value = clickEl.textContent || clickEl.innerText;
 
+			var beforeInputValue = self.input.value || "";
+			var afterInputValue = "";
+
 			if(clickEl.tagName.toLocaleLowerCase() === 'td' && value === "删除"){
-				var num = self.input.value;
-				if(num){
-					self.input.value = num.slice(0,-1);
-				}
+				//back space
+				afterInputValue = beforeInputValue.slice(0,-1);
 			}else if(clickEl.tagName.toLocaleLowerCase() === 'div' && value === "完成"){
 				//click on  finish
 				body.removeChild(self.el);
@@ -137,17 +147,30 @@ input2.onclick = function(){
 				self.el = null;
 			}else if(clickEl.tagName.toLocaleLowerCase() === 'div' && value === "清空"){
 				//click on  empey
-				if(self.input){
-					self.input.value = "";
-				}
+				afterInputValue = "";
 			}else if(clickEl.tagName.toLocaleLowerCase() === 'td'){
-				//click on a number
-				if(self.input){
-					self.input.value += value;
-				}
+				//click on a number or character
+				afterInputValue = beforeInputValue + value;
 			}
-			//set display
-			self&&self.el&&( self.el.getElementsByClassName(inputPreviewId)[0].innerText = self.input.value );
+
+			if(self&&self.el){
+				if(self.input.maxLength>0){
+					afterInputValue = afterInputValue.slice(0,self.input.maxLength);
+				}
+
+				var previewValue;
+				if(onInput){
+					[afterInputValue,previewValue] = onInput(afterInputValue,beforeInputValue);
+				}
+
+				//set to element
+				self.input.value = afterInputValue;
+				//set display
+				self.el.getElementsByClassName(inputPreviewId)[0].innerText
+					= [undefined,null].every(i=>i!==previewValue) ?
+						previewValue :
+						self.input.value;
+			}
 		}
 		
 		if(mobile){
